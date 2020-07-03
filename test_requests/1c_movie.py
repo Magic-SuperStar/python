@@ -2,6 +2,7 @@
 import requests
 import lxml.etree
 
+
 #爬虫页面详细信息
 
 #电影详细页面
