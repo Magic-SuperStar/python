@@ -30,15 +30,23 @@ class MoviesSpider(scrapy.Spider):
         items = []
         soup = bs(response.text, 'html.parser')
         title_list = soup.find_all('div', attrs={'class': 'hd'})
-        for i in range(len(title_list)):
-            # 在Python中应该这样写
-            # for i in title_list:
+        # for i in range(len(title_list)):
+        # 在Python中应该这样写
+        for i in title_list:
             # 在items.py定义
             item = SpidersItem()
-            tinfo = title_list[i].find('a')
+            tinfo = i.find('a')
             title = tinfo.find('span', ).text
             link = tinfo.get('href')
-            item['title']=title
-            item['link']=link
-            items.append(item)
-        return items
+            item['title'] = title
+            item['link'] = link
+            yield scrapy.Request(url=link, meta={'item': item}, callback=self.parse1)
+            # items.append(item)
+        # return items
+
+    def parse1(self, response):
+        item = response.meta['item']
+        soup = bs(response.text, 'html.parser')
+        content = soup.find('div', attrs={'class': 'related-info'}).get_text().strip()
+        item['content'] = content
+        yield item
